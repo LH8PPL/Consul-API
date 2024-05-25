@@ -1,4 +1,5 @@
 flask
 requests
+psutil
 flask-smorest
 python-dotenv
