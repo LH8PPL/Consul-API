@@ -1,10 +1,17 @@
 from flask import Flask
+import requests
 
 app = Flask(__name__)
 
+CONSUL_URL = 'http://localhost:8500/v1'
+
 @app.get("/v1/api/consulCluster/status")
 def get_status():
-    return {"status": 1, "message": "Consul server is running"}
+    response = requests.get(f'{CONSUL_URL}/agent/self')
+    if response.status_code == 200:
+        return {"status": 1, "message": "Consul server is running"}
+    else:
+        return {"status": 0, "message": "Consul server is down"}
 
 
 @app.get("/v1/api/consulCluster/summary")
