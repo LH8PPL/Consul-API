@@ -3,7 +3,7 @@ import requests
 
 app = Flask(__name__)
 
-CONSUL_URL = 'http://localhost:8500/v1'
+CONSUL_URL = 'http://host.docker.internal:8500/v1'
 
 @app.get("/v1/api/consulCluster/status")
 def get_status():
