@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_smorest import abort
 import requests
 import os
 import psutil # i would have used the prometheus client and/or prometheus flask for scraping or exporting metrics to a monitoring system 
@@ -40,9 +41,9 @@ def get_summary():
             protocol_version = agent_self.json()['Stats']['raft']['protocol_version']
             return {"registered_nodes": registered_nodes, "registered_services": registered_services, "leader": leader, "cluster_protocol": protocol_version}
         else:
-            return {"error": "Failed to retrieve summary"}, 500
+            abort(500, message="Failed to retrieve summary")
     except requests.exceptions.RequestException as e:
-        return {"error": str(e)}, 500
+        abort(500, message=str(e))
 
 
 @app.get("/v1/api/consulCluster/members")
@@ -53,9 +54,9 @@ def get_members():
             members = [member['Node'] for member in response.json()]
             return {"registered_nodes": members}
         else:
-            return {"error": "Failed to retrieve members"}, response.status_code
+            abort(response.status_code, message="Failed to retrieve members")
     except requests.exceptions.RequestException as e:
-        return {"error": str(e)}, 500
+        abort(500, message=str(e))
 
 @app.get("/v1/api/consulCluster/systemInfo")
 def get_systemInfo():
@@ -78,6 +79,5 @@ def get_systemInfo():
             "Load_Average_15min": os.getloadavg()[2]
         }
         return system_info
-        #return {"vCpus": "1", "MemoryGB": "1", "metric3": "1"}
     except Exception as e:
-        return {"error": str(e)}, 500
+        abort(500, message=str(e))
