@@ -11,12 +11,15 @@ CONSUL_URL = 'http://host.docker.internal:8500/v1'
 # used /status/leader instead of /agent/self, looks like a better check, /status/peers could do the job too
 @app.get("/v1/api/consulCluster/status")
 def get_status():
-    response = requests.get(f'{CONSUL_URL}/agent/self')
-    if response.status_code == 200:
-        return {"status": 1, "message": "Consul server is running"}
-    else:
-        return {"status": 0, "message": "Consul server is down"}
-
+    try:
+        response = requests.get(f'{CONSUL_URL}/status/leader')
+        if response.status_code == 200:
+            return {"status": 1, "message": "Consul server is running"}
+        else:
+            return {"status": 0, "message": "Consul server is down"}, response.status_code # If the status code is not 200, it returns that the Consul server is down, along with the actual status code from the response
+    except requests.exceptions.RequestException as e: #All exceptions that Requests explicitly raises inherit from
+        return {"status": 0, "message": str(e)}, 500
+    
 # https://developer.hashicorp.com/consul/api-docs/catalog
 # 
 @app.get("/v1/api/consulCluster/summary") 
