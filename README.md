@@ -24,17 +24,16 @@ The `Dockerfile` under api_service folder, that runs the API application.
 
 ### Consul Cluster Creation
 ```
-# Create the first Consul server to bootstrap the Consul cluster
+# Create the Consul server to bootstrap the Consul cluster
 vagrant up 
 
-# As the rest of the Consul servers come online, open up another terminal
-# and log on to the consul01 server to see the Consul cluster converge.
+# open up another terminal and log on to the consul01 server to see the Consul cluster converge.
 vagrant ssh consul01
 
 # On the Consul server, see the membership list by running "consul members".
 consul members
 
-# OPTIONAL: Destroy the bootstrap Consul server (since it's outlived it usefulness in this setup)
+# OPTIONAL: Destroy the Consul server (since it's outlived it usefulness in this setup)
 vagrant destroy
 ```
 ### Quick check if everything works
