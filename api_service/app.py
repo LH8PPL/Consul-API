@@ -40,9 +40,9 @@ def get_summary():
             protocol_version = agent_self.json()['Stats']['raft']['protocol_version']
             return {"registered_nodes": registered_nodes, "registered_services": registered_services, "leader": leader, "cluster_protocol": protocol_version}
         else:
-            raise Exception("Failed to retrieve summary")
+            return {"error": "Failed to retrieve summary"}, 500
     except requests.exceptions.RequestException as e:
-        return {"error": str(e)}
+        return {"error": str(e)}, 500
 
 
 @app.get("/v1/api/consulCluster/members")
@@ -59,22 +59,25 @@ def get_members():
 
 @app.get("/v1/api/consulCluster/systemInfo")
 def get_systemInfo():
-    # System information
-    system_info = {
-        "vCpus": os.cpu_count(),
-        "MemoryGB": round(os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') / (1024.**3), 2),
-        "HostName": os.uname()[1],
-        "OS": os.uname()[0],
-        "KernelVersion": os.uname()[2],
-        "Architecture": os.uname()[4],
-        "CPU_Usage_Percentage": psutil.cpu_percent(interval=1),
-        "Memory_Usage_Percentage": psutil.virtual_memory().percent,
-        "Disk_Usage_Percentage": psutil.disk_usage('/').percent,
-        "Network_Bytes_Sent": psutil.net_io_counters().bytes_sent,
-        "Network_Bytes_Received": psutil.net_io_counters().bytes_recv,
-        "Load_Average_1min": os.getloadavg()[0],
-        "Load_Average_5min": os.getloadavg()[1],
-        "Load_Average_15min": os.getloadavg()[2]
-    }
-    return system_info
-    #return {"vCpus": "1", "MemoryGB": "1", "metric3": "1"}
+    try:
+        # System information
+        system_info = {
+            "vCpus": os.cpu_count(),
+            "MemoryGB": round(os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') / (1024.**3), 2),
+            "HostName": os.uname()[1],
+            "OS": os.uname()[0],
+            "KernelVersion": os.uname()[2],
+            "Architecture": os.uname()[4],
+            "CPU_Usage_Percentage": psutil.cpu_percent(interval=1),
+            "Memory_Usage_Percentage": psutil.virtual_memory().percent,
+            "Disk_Usage_Percentage": psutil.disk_usage('/').percent,
+            "Network_Bytes_Sent": psutil.net_io_counters().bytes_sent,
+            "Network_Bytes_Received": psutil.net_io_counters().bytes_recv,
+            "Load_Average_1min": os.getloadavg()[0],
+            "Load_Average_5min": os.getloadavg()[1],
+            "Load_Average_15min": os.getloadavg()[2]
+        }
+        return system_info
+        #return {"vCpus": "1", "MemoryGB": "1", "metric3": "1"}
+    except Exception as e:
+        return {"error": str(e)}, 500
