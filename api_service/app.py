@@ -24,17 +24,25 @@ def get_status():
 # 
 @app.get("/v1/api/consulCluster/summary") 
 def get_summary():
-    nodes_response = requests.get(f'{CONSUL_URL}/catalog/nodes')
-    services_response = requests.get(f'{CONSUL_URL}/catalog/services')
-    status_response = requests.get(f'{CONSUL_URL}/status/leader')
-    agent_self = requests.get(f'{CONSUL_URL}/agent/self')
-
-    registered_services = len(services_response.json())
-    registered_nodes = len(nodes_response.json())
-    leader = status_response.text.strip('"')
-    protocol_version = agent_self.json()['Stats']['raft']['protocol_version']
-
-    return {"registered_nodes": registered_nodes, "registered_services": registered_services, "leader": leader, "cluster_protocol": protocol_version}
+    try:
+        nodes_response = requests.get(f'{CONSUL_URL}/catalog/nodes')
+        services_response = requests.get(f'{CONSUL_URL}/catalog/services')
+        status_response = requests.get(f'{CONSUL_URL}/status/leader')
+        agent_self = requests.get(f'{CONSUL_URL}/agent/self')
+        if (
+            nodes_response.status_code == 200 
+            and services_response.status_code == 200 
+            and status_response.status_code == 200
+            ):
+            registered_services = len(services_response.json())
+            registered_nodes = len(nodes_response.json())
+            leader = status_response.text.strip('"')
+            protocol_version = agent_self.json()['Stats']['raft']['protocol_version']
+            return {"registered_nodes": registered_nodes, "registered_services": registered_services, "leader": leader, "cluster_protocol": protocol_version}
+        else:
+            raise Exception("Failed to retrieve summary")
+    except requests.exceptions.RequestException as e:
+        return {"error": str(e)}
 
 
 @app.get("/v1/api/consulCluster/members")
