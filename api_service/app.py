@@ -47,10 +47,15 @@ def get_summary():
 
 @app.get("/v1/api/consulCluster/members")
 def get_members():
-    response = requests.get(f'{CONSUL_URL}/catalog/nodes')
-    members = [member['Node'] for member in response.json()]
-    return {"registered_nodes": members}
-
+    try:
+        response = requests.get(f'{CONSUL_URL}/catalog/nodes')
+        if response.status_code == 200:
+            members = [member['Node'] for member in response.json()]
+            return {"registered_nodes": members}
+        else:
+            return {"error": "Failed to retrieve members"}, response.status_code
+    except requests.exceptions.RequestException as e:
+        return {"error": str(e)}, 500
 
 @app.get("/v1/api/consulCluster/systemInfo")
 def get_systemInfo():
