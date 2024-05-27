@@ -1,0 +1,14 @@
+{
+    "service": {
+      "name": "my-service",
+      "tags": ["primary"],
+      "port": 8080,
+      "check": {
+        "id": "my-service-check",
+        "name": "HTTP API on port 8080",
+        "http": "http://localhost:8080/health",
+        "interval": "10s",
+        "timeout": "1s"
+      }
+    }
+  }

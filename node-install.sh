@@ -1,7 +1,8 @@
 #!/bin/bash
 # Update the package list and install prerequisites
 sudo apt-get update -y
-sudo apt-get install unzip curl vim jq -y
+sudo apt-get install unzip curl vim jq python3-pip -y
+
 # make an archive folder to move old binaries into
 if [ ! -d /tmp/archive ]; then
   sudo mkdir /tmp/archive/
@@ -24,9 +25,14 @@ fi
 sudo mv consul /tmp/archive/consul
 sudo mkdir -p /etc/consul.d
 sudo chmod a+w /etc/consul.d
+
 # Create Consul configuration
 sudo cp /vagrant/consul-config/consul-server.hcl /etc/consul.d/
 sudo cp /vagrant/consul-config/consul-client.hcl /etc/consul.d/
 
+# Move the service definition file to Consul configuration directory
+sudo cp /vagrant/service.json /etc/consul.d/
 
+# Install Flask using apt
+sudo apt-get install -y python3-flask
 
